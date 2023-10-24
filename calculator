@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(CalculatorApp());
+}
+
+class CalculatorApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Calculator App',
+      home: CalculatorScreen(),
+    );
+  }
+}
+
+class CalculatorScreen extends StatefulWidget {
+  @override
+  _CalculatorScreenState createState() => _CalculatorScreenState();
+}
+
+class _CalculatorScreenState extends State<CalculatorScreen> {
+  String _expression = '';
+  String _result = '';
+
+  void _onButtonPressed(String buttonText) {
+    setState(() {
+      if (buttonText == 'C') {
+        _expression = '';
+        _result = '';
+      } else if (buttonText == '=') {
+        try {
+          _result = evalExpression(_expression).toString();
+        } catch (e) {
+          _result = 'Error';
+        }
+      } else {
+        _expression += buttonText;
+      }
+    });
+  }
+
+  double evalExpression(String expression) {
+    return double.parse(expression);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Calculator'),
+      ),
+      body: Column(
+        children: [
+          Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Text(
+              _expression,
+              style: TextStyle(fontSize: 24),
+            ),
+          ),
+          Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Text(
+              _result,
+              style: TextStyle(fontSize: 48),
+            ),
+          ),
+          Expanded(
+            child: GridView.builder(
+              itemCount: 20,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return CalculatorButton(
+                  buttonText: CalculatorButton.buttonTexts[index],
+                  onTap: _onButtonPressed,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CalculatorButton extends StatelessWidget {
+  final String buttonText;
+  final Function(String) onTap;
+
+  CalculatorButton({required this.buttonText, required this.onTap});
+
+  static const buttonTexts = [
+    '7', '8', '9', '/',
+    '4', '5', '6', '*',
+    '1', '2', '3', '-',
+    '.', '0', '=', '+',
+    'C',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(4),
+      child: ElevatedButton(
+        onPressed: () => onTap(buttonText),
+        child: Text(
+          buttonText,
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+    );
+  }
+}
